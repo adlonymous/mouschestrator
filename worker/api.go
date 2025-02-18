@@ -2,9 +2,8 @@ package worker
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
+	"net/http"
 )
 
 type ErrResponse struct {
@@ -27,6 +26,9 @@ func (a *Api) initRouter() {
 		r.Route("/{taskID}", func(r chi.Router) {
 			r.Delete("/", a.StopTaskHandler)
 		})
+	})
+	a.Router.Route("/stats", func(r chi.Router) {
+		r.Get("/", a.GetStatsHandler)
 	})
 }
 
