@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"orchestrator/task"
 	"orchestrator/worker"
+	"time"
 )
 
 type Manager struct {
@@ -57,7 +58,7 @@ func (m *Manager) AddTask(te task.TaskEvent) {
 	m.Pending.Enqueue(te)
 }
 
-func (m *Manager) UpdateTasks() {
+func (m *Manager) updateTasks() {
 	for _, worker := range m.Workers {
 		log.Printf("Checking worker %v for task updates", worker)
 		url := fmt.Sprintf("http://%s/tasks", worker)
@@ -143,5 +144,24 @@ func (m *Manager) SendWork() {
 		log.Printf("%#v\n", t)
 	} else {
 		log.Printf("No work in the queue")
+	}
+}
+
+func (m *Manager) UpdateTasks() {
+	for {
+		log.Println("Checking for task updates from workers")
+		m.updateTasks()
+		log.Println("Task updates completed")
+		log.Println("Sleeping for 15 seconds")
+		time.Sleep(15 * time.Second)
+	}
+}
+
+func (m *Manager) ProcessTasks() {
+	for {
+		log.Println("Processsing any tasks in the queue")
+		m.SendWork()
+		log.Println("Sleeping for 10 seconds")
+		time.Sleep(10 * time.Second)
 	}
 }
